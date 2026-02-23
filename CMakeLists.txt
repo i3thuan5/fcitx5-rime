@@ -29,12 +29,18 @@ if ("${Rime_VERSION}" VERSION_LESS "1.8.0")
     add_definitions(-DFCITX_RIME_NO_DELETE_CANDIDATE)
 endif()
 
-if(NOT DEFINED RIME_DATA_DIR)
+if(SCHEME_ID)
+  set(RIME_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/${SCHEME_ID}/data")
+elseif(NOT DEFINED RIME_DATA_DIR)
   find_package(RimeData REQUIRED)
-endif(NOT DEFINED RIME_DATA_DIR)
+endif()
 message(STATUS "Precompiler macro RIME_DATA_DIR is set to \"${RIME_DATA_DIR}\"")
 add_definitions(-DRIME_DATA_DIR="${RIME_DATA_DIR}")
-add_definitions(-DFCITX_GETTEXT_DOMAIN=\"fcitx5-rime\")
+if(SCHEME_ID)
+  add_definitions(-DFCITX_GETTEXT_DOMAIN=\"fcitx5-${SCHEME_ID}\")
+else()
+  add_definitions(-DFCITX_GETTEXT_DOMAIN=\"fcitx5-rime\")
+endif()
 add_definitions(-DFCITX_RIME_VERSION=\"${PROJECT_VERSION}\")
 fcitx5_add_i18n_definition()
 
@@ -45,13 +51,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 include("${FCITX_INSTALL_CMAKECONFIG_DIR}/Fcitx5Utils/Fcitx5CompilerSettings.cmake")
 
 add_subdirectory(po)
-add_subdirectory(src)
-add_subdirectory(data)
 
-fcitx5_translate_desktop_file(org.fcitx.Fcitx5.Addon.Rime.metainfo.xml.in
-                              org.fcitx.Fcitx5.Addon.Rime.metainfo.xml XML)
+if(SCHEME_ID)
+  include(schemes.cmake)
+else()
+  add_subdirectory(src)
+  add_subdirectory(data)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.fcitx.Fcitx5.Addon.Rime.metainfo.xml" DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+  fcitx5_translate_desktop_file(org.fcitx.Fcitx5.Addon.Rime.metainfo.xml.in
+                                org.fcitx.Fcitx5.Addon.Rime.metainfo.xml XML)
+
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.fcitx.Fcitx5.Addon.Rime.metainfo.xml" DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+endif()
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 

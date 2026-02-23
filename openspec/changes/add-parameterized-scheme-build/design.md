@@ -104,6 +104,13 @@ fcitx5-rime 是上游 fcitx5 的 Rime 輸入法引擎包裝器。我們 fork 了
 ### 決策 3：新增檔案結構
 
 ```
+Rime-Logo/                    ← git submodule（圖示來源）
+schemes/
+├── Rime-HanLo/               ← git submodule（方案資料）
+├── Rime-POJ/
+├── Rime-POJHan/
+├── Rime-TOJ/
+└── Rime-TsuanLo/
 src/
 ├── scheme_config.h.in        ← CMake configure_file() 樣板
 ├── scheme_factory.cpp.in     ← 方案專屬的 factory 樣板
@@ -111,10 +118,12 @@ src/
 └── scheme-addon.conf.in.in   ← Addon 設定樣板
 schemes.cmake                 ← 參數化建置邏輯模組
 packaging/
-├── Dockerfile                ← Ubuntu .deb 建置
+├── Dockerfile-22.04          ← Ubuntu 22.04 .deb 建置
+├── Dockerfile-24.04          ← Ubuntu 24.04 .deb 建置
 ├── build-all.sh              ← 一次建置 5 個 .deb
 ├── schemes.conf              ← 5 個方案的參數定義
-└── README.md                 ← 各發行版打包指引
+├── fcitx5-scheme.spec        ← Fedora/openSUSE RPM 範例
+└── PKGBUILD                  ← Arch Linux 範例
 ```
 
 ### 決策 4：schemes.cmake 的結構
@@ -239,19 +248,22 @@ Rime-TsuanLo         tsuanlo    ÌTHUÂN_KIP           全             nan-TW
 
 每個方案需要 6 個圖示（主圖示、im、deploy、latin、disable、sync），分為 48x48 PNG 和 scalable SVG 兩種格式。
 
-**選擇：** 不加 Rime-Logo 為 submodule。從 Rime-Logo repo 預先複製各方案的主圖示到專案內的 `data/icons/` 目錄，直接納入版本控制。其他 5 個狀態圖示（im、deploy、latin、disable、sync）複製自現有 fcitx5-rime 的圖示並改名。
+**選擇：** 以 git submodule 方式在專案根目錄加入 Rime-Logo（`Rime-Logo/`），建置時從 submodule 中讀取各方案的主圖示。其他 5 個狀態圖示（im、deploy、latin、disable、sync）複製自現有 fcitx5-rime 的圖示並改名。
 
-預先複製的圖示來源（Rime-Logo repo）：
+Rime-Logo submodule 中各方案的圖示路徑：
 
-| 方案 | Rime-Logo 路徑 (TOO) | 複製到 |
+| 方案 | Rime-Logo 路徑 (TOO) | 安裝為 |
 |------|----------------------|--------|
-| hanlo | `kip-hanlo/fcitx-rime/ithuan.png/svg` | `data/icons/fcitx-hanlo.png/svg` |
-| poj | `poj-choanlo/fcitx-rime/ithuan.png/svg` | `data/icons/fcitx-poj.png/svg` |
-| pojhan | `poj-hanlo/fcitx-rime/ithuan.png/svg` | `data/icons/fcitx-pojhan.png/svg` |
-| toj | `toj/fcitx-rime/ithuan.png/svg` | `data/icons/fcitx-toj.png/svg` |
-| tsuanlo | `kip-tsuanlo/fcitx-rime/ithuan.png/svg` | `data/icons/fcitx-tsuanlo.png/svg` |
+| hanlo | `Rime-Logo/kip-hanlo/fcitx-rime/ithuan.png/svg` | `fcitx-hanlo.png/svg` |
+| poj | `Rime-Logo/poj-choanlo/fcitx-rime/ithuan.png/svg` | `fcitx-poj.png/svg` |
+| pojhan | `Rime-Logo/poj-hanlo/fcitx-rime/ithuan.png/svg` | `fcitx-pojhan.png/svg` |
+| toj | `Rime-Logo/toj/fcitx-rime/ithuan.png/svg` | `fcitx-toj.png/svg` |
+| tsuanlo | `Rime-Logo/kip-tsuanlo/fcitx-rime/ithuan.png/svg` | `fcitx-tsuanlo.png/svg` |
 
-`schemes.cmake` 在安裝時從 `data/icons/` 讀取對應方案的圖示，安裝到 icon theme 路徑。
+`schemes.cmake` 在安裝時直接從 `Rime-Logo/<TOO>/fcitx-rime/` 讀取主圖示，安裝到 icon theme 路徑。需要新增 CMake 參數 `SCHEME_ICON_TOO` 來指定各方案在 Rime-Logo 中對應的目錄名稱。
+
+**替代方案考慮：**
+- **預先複製到 `data/icons/`：** 可行但圖示更新時需手動重新複製，不如 submodule 自動同步。放棄。
 
 ### 決策 11：RIME_DATA_DIR 採用各方案獨立目錄
 
@@ -290,8 +302,8 @@ set(RIME_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/${SCHEME_ID}/data")
 **[librime 版本相容性] → 依賴系統套件版本**
 動態連結意味著依賴系統提供的 librime 版本。若特定方案需要較新的 librime 功能，可能與舊版系統不相容。緩解方式：在 .deb 的 Depends 中宣告最低版本要求。
 
-**[圖示部分差異化] → 主圖示來自 Rime-Logo，狀態圖示仍共用**
-主圖示由 Rime-Logo 提供各方案專屬設計，但 5 個狀態圖示（im、deploy、latin、disable、sync）暫時共用 fcitx5-rime 的設計改名。使用者在輸入法清單中可透過主圖示區分方案，但狀態列圖示外觀相同。
+**[圖示部分差異化] → 主圖示來自 Rime-Logo submodule，狀態圖示仍共用**
+主圖示由 Rime-Logo submodule 提供各方案專屬設計，建置時直接從 submodule 路徑讀取。5 個狀態圖示（im、deploy、latin、disable、sync）暫時共用 fcitx5-rime 的設計改名。使用者在輸入法清單中可透過主圖示區分方案，但狀態列圖示外觀相同。
 
 ## Open Questions
 

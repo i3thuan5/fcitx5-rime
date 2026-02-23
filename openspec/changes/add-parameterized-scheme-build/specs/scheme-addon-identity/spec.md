@@ -42,12 +42,16 @@
 - **WHEN** poj addon 註冊 action
 - **THEN** action 名稱 SHALL 為 `"fcitx-poj-im"`、`"fcitx-poj-deploy"` 等
 
-### Requirement: 圖示命名
-每個方案 addon SHALL 使用以方案名稱為前綴的圖示名稱。
+### Requirement: 圖示命名與來源
+每個方案 addon SHALL 使用以方案名稱為前綴的圖示名稱。主圖示 SHALL 來自 Rime-Logo submodule，狀態圖示 SHALL 複製自現有 fcitx5-rime 圖示並重新命名。
 
 #### Scenario: hanlo 方案的圖示
 - **WHEN** hanlo addon 在 fcitx5 中顯示狀態
 - **THEN** 使用的圖示名稱 SHALL 為 `fcitx-hanlo`（主圖示）、`fcitx_hanlo_im`（輸入模式）、`fcitx_hanlo_deploy`（部署）、`fcitx_hanlo_latin`（英文模式）、`fcitx_hanlo_disable`（停用）、`fcitx_hanlo_sync`（同步）
+
+#### Scenario: 主圖示來自 Rime-Logo submodule
+- **WHEN** 以 `-DSCHEME_ID=hanlo -DSCHEME_ICON_TOO=kip-hanlo` 建置
+- **THEN** 主圖示 SHALL 從 `Rime-Logo/kip-hanlo/fcitx-rime/ithuan.png` 及 `.svg` 讀取，安裝為 `fcitx-hanlo.png` 及 `.svg`
 
 ### Requirement: 與 fcitx5-rime 共存
 方案 addon SHALL 能與原版 fcitx5-rime 在同一系統中共存。

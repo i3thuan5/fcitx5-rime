@@ -10,13 +10,32 @@
 
 此配置 SHALL 與 Sujiphuat-Swift 專案的 submodule 結構一致。
 
+### Requirement: Rime-Logo 以 git submodule 管理
+專案 SHALL 在根目錄以 git submodule 的方式管理圖示來源 repo：
+- `Rime-Logo/` → `git@github.com:i3thuan5/Rime-Logo.git`
+
+Rime-Logo submodule 提供各方案的主圖示，建置時 SHALL 從此 submodule 讀取對應方案的圖示檔案。
+
 #### Scenario: clone 後初始化 submodule
 - **WHEN** 使用者執行 `git clone --recursive` 或 `git submodule update --init`
-- **THEN** `schemes/` 下的 5 個子目錄 SHALL 各自 checkout 對應 repo 的內容
+- **THEN** `schemes/` 下的 5 個子目錄及 `Rime-Logo/` SHALL 各自 checkout 對應 repo 的內容
 
 #### Scenario: submodule 路徑結構
 - **WHEN** submodule 初始化完成
 - **THEN** 每個方案的 `sujiphoat/` 子目錄 SHALL 存在且包含輸入法資料檔
+- **THEN** `Rime-Logo/` 底下 SHALL 包含各方案對應的圖示目錄
+
+#### Scenario: Rime-Logo 圖示路徑
+- **WHEN** submodule 初始化完成
+- **THEN** 各方案的主圖示 SHALL 位於以下路徑：
+
+| 方案 | 圖示路徑 |
+|------|----------|
+| hanlo | `Rime-Logo/kip-hanlo/fcitx-rime/ithuan.png` 及 `.svg` |
+| poj | `Rime-Logo/poj-choanlo/fcitx-rime/ithuan.png` 及 `.svg` |
+| pojhan | `Rime-Logo/poj-hanlo/fcitx-rime/ithuan.png` 及 `.svg` |
+| toj | `Rime-Logo/toj/fcitx-rime/ithuan.png` 及 `.svg` |
+| tsuanlo | `Rime-Logo/kip-tsuanlo/fcitx-rime/ithuan.png` 及 `.svg` |
 
 ### Requirement: 方案資料檔的安裝
 建置系統 SHALL 將各方案 `schemes/<name>/sujiphoat/` 底下的必要檔案安裝到 `RIME_DATA_DIR`。

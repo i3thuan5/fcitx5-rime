@@ -118,8 +118,7 @@ src/
 └── scheme-addon.conf.in.in   ← Addon 設定樣板
 schemes.cmake                 ← 參數化建置邏輯模組
 packaging/
-├── Dockerfile-22.04          ← Ubuntu 22.04 .deb 建置
-├── Dockerfile-24.04          ← Ubuntu 24.04 .deb 建置
+├── Dockerfile-25.10          ← Ubuntu 25.10 .deb 建置
 ├── build-all.sh              ← 一次建置 5 個 .deb
 ├── schemes.conf              ← 5 個方案的參數定義
 ├── fcitx5-scheme.spec        ← Fedora/openSUSE RPM 範例
@@ -276,17 +275,22 @@ set(RIME_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/${SCHEME_ID}/data")
 
 **理由：** 多方案各有自己的 `default.yaml`（`schema_list` 不同），獨立目錄避免互相覆蓋，也與 Dockerfile-22.04 的做法一致（`/usr/share/${APP_LINUX_ID}/data`）。
 
-### 決策 12：Dockerfile 支援 Ubuntu 22.04 和 24.04，另附 Fedora/Arch 套件
+### 決策 12：Dockerfile 支援 Ubuntu 25.10，另附 Fedora/Arch 套件
 
-**選擇：** 提供兩個 Dockerfile variant：
-- `packaging/Dockerfile-22.04` — Ubuntu 22.04 (Jammy)
-- `packaging/Dockerfile-24.04` — Ubuntu 24.04 (Noble)
+**選擇：** 提供一個 Dockerfile variant：
+- `packaging/Dockerfile-25.10` — Ubuntu 25.10 (Questing)
 
 另外提供：
 - `packaging/fcitx5-scheme.spec` — Fedora/openSUSE RPM spec 範例
 - `packaging/PKGBUILD` — Arch Linux PKGBUILD 範例
 
-`build-all.sh` 預設建置 22.04 和 24.04 兩個版本，共 5 × 2 = 10 個 .deb 檔。
+`build-all.sh` 預設建置 25.10 版本，共 5 個 .deb 檔。
+
+**版本限制：** 本專案使用 `FCITX_ADDON_FACTORY_V2` 巨集（fcitx5 5.1.9 引入），且上游 CMakeLists.txt 要求 Fcitx5Core >= 5.1.13。Ubuntu 24.04 的 fcitx5 僅 5.1.7，不符合要求。Ubuntu 25.10 提供 fcitx5 5.1.14，滿足需求。
+
+**替代方案考慮：**
+- **Rebase 到 fcitx5-rime 5.1.5（相容 fcitx5 5.1.7）：** 可支援 Ubuntu 24.04，但需放棄 namespace 重構、StandardPath 新 API 等上游改進，工作量大。放棄。
+- **加 PPA 取得新版 fcitx5：** 增加外部依賴，不穩定。放棄。
 
 ## Risks / Trade-offs
 

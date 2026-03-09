@@ -46,7 +46,7 @@ task_8_1() {
     local BUILD_DIR="/tmp/test-8.1"
 
     docker build \
-        -f "$SCRIPT_DIR/Dockerfile-24.04" \
+        -f "$SCRIPT_DIR/Dockerfile-25.10" \
         -t "$TAG" \
         "$PROJECT_DIR" \
         --target="" \
@@ -57,7 +57,7 @@ task_8_1() {
         -f - \
         -t "$TAG" \
         "$PROJECT_DIR" <<'DOCKERFILE'
-FROM ubuntu:24.04
+FROM ubuntu:25.10
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Taipei
 RUN apt-get update && apt-get install -y \
@@ -106,7 +106,7 @@ task_8_2() {
         -f - \
         -t "$TAG" \
         "$PROJECT_DIR" <<'DOCKERFILE'
-FROM ubuntu:24.04
+FROM ubuntu:25.10
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Taipei
 RUN apt-get update && apt-get install -y \
@@ -163,16 +163,16 @@ DOCKERFILE
         docker run --rm "$TAG" sh -c '! test -f /staging/usr/share/fcitx5/addon/rime.conf'
 }
 
-# ─── 8.3 用 Dockerfile-24.04 建 .deb ───
+# ─── 8.3 用 Dockerfile-25.10 建 .deb ───
 task_8_3() {
-    header "8.3 打包：Dockerfile-24.04 建置 hanlo .deb"
+    header "8.3 打包：Dockerfile-25.10 建置 hanlo .deb"
 
     local TAG="fcitx5-hanlo-deb-test"
     local OUTPUT_DIR="$PROJECT_DIR/build/test-deb"
     mkdir -p "$OUTPUT_DIR"
 
     docker build \
-        -f "$SCRIPT_DIR/Dockerfile-24.04" \
+        -f "$SCRIPT_DIR/Dockerfile-25.10" \
         --build-arg "SCHEME_SUBMODULE=Rime-HanLo" \
         --build-arg "SCHEME_ID=hanlo" \
         --build-arg "SCHEME_NAME=意傳教育部漢羅" \
@@ -197,15 +197,15 @@ task_8_3() {
     if [ -n "$DEB" ]; then
         echo ""
         echo "dpkg -c 內容："
-        dpkg -c "$DEB" || docker run --rm -v "$DEB:/tmp/pkg.deb" ubuntu:24.04 dpkg -c /tmp/pkg.deb
+        dpkg -c "$DEB" || docker run --rm -v "$DEB:/tmp/pkg.deb" ubuntu:25.10 dpkg -c /tmp/pkg.deb
 
         echo ""
         echo "dpkg -I 資訊："
-        dpkg -I "$DEB" || docker run --rm -v "$DEB:/tmp/pkg.deb" ubuntu:24.04 dpkg -I /tmp/pkg.deb
+        dpkg -I "$DEB" || docker run --rm -v "$DEB:/tmp/pkg.deb" ubuntu:25.10 dpkg -I /tmp/pkg.deb
 
         # 驗證 .deb 內容
         local DEB_CONTENTS
-        DEB_CONTENTS=$(dpkg -c "$DEB" 2>/dev/null || docker run --rm -v "$DEB:/tmp/pkg.deb" ubuntu:24.04 dpkg -c /tmp/pkg.deb)
+        DEB_CONTENTS=$(dpkg -c "$DEB" 2>/dev/null || docker run --rm -v "$DEB:/tmp/pkg.deb" ubuntu:25.10 dpkg -c /tmp/pkg.deb)
 
         check ".deb 包含 libhanlo.so" \
             echo "$DEB_CONTENTS" | grep -q "libhanlo.so"
@@ -243,7 +243,7 @@ task_8_4() {
     local DEB_BASENAME
     DEB_BASENAME=$(basename "$DEB")
 
-    docker run --rm -v "$DEB:/tmp/$DEB_BASENAME" ubuntu:24.04 bash -c "
+    docker run --rm -v "$DEB:/tmp/$DEB_BASENAME" ubuntu:25.10 bash -c "
         apt-get update -qq
         apt-get install -y -qq fcitx5 librime1 >/dev/null 2>&1 || true
         dpkg -i /tmp/$DEB_BASENAME 2>&1 || apt-get install -f -y -qq 2>&1
@@ -269,7 +269,7 @@ task_8_4() {
     "
 
     check ".deb 安裝成功" \
-        docker run --rm -v "$DEB:/tmp/$DEB_BASENAME" ubuntu:24.04 bash -c "
+        docker run --rm -v "$DEB:/tmp/$DEB_BASENAME" ubuntu:25.10 bash -c "
             apt-get update -qq >/dev/null 2>&1
             apt-get install -y -qq fcitx5 librime1 >/dev/null 2>&1 || true
             dpkg -i /tmp/$DEB_BASENAME >/dev/null 2>&1 || apt-get install -f -y -qq >/dev/null 2>&1

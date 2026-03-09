@@ -35,8 +35,8 @@
 ## 6. 打包：Ubuntu .deb
 
 - [x] 6.1 更新 `packaging/schemes.conf`，加入 `SCHEME_ICON_TOO` 欄位（kip-hanlo、poj-choanlo、poj-hanlo、toj、kip-tsuanlo）
-- [x] 6.2 更新 `packaging/Dockerfile-22.04`、`Dockerfile-24.04`，傳遞 `SCHEME_ICON_TOO` 建置參數
-- [x] 6.3 更新 `packaging/build-all.sh`，從 schemes.conf 讀取並傳遞 `SCHEME_ICON_TOO`
+- [x] 6.2 移除 `packaging/Dockerfile-22.04`，將 `Dockerfile-24.04` 改為 `Dockerfile-25.10`（基於 `ubuntu:25.10`，fcitx5 5.1.14），傳遞 `SCHEME_ICON_TOO` 建置參數
+- [x] 6.3 更新 `packaging/build-all.sh`，改為只建置 25.10，從 schemes.conf 讀取並傳遞 `SCHEME_ICON_TOO`
 
 ## 7. 打包：Fedora 與 Arch Linux
 
@@ -47,5 +47,5 @@
 
 - [ ] 8.1 不帶 `-DSCHEME_ID` 建置，確認行為與上游 fcitx5-rime 一致（回歸測試）
 - [ ] 8.2 以 `-DSCHEME_ID=hanlo -DSCHEME_NAME=意傳教育部漢羅 -DSCHEME_ICON_TOO=kip-hanlo` 建置，確認產出 `libhanlo.so`、`hanlo.conf`、addon conf，且主圖示從 Rime-Logo submodule 正確安裝
-- [ ] 8.3 使用 Dockerfile-24.04 建置 hanlo 的 .deb，確認 `dpkg -c` 內容正確
-- [ ] 8.4 在 Ubuntu 環境安裝 .deb，確認 fcitx5 輸入法清單出現漢羅輸入法
+- [ ] 8.3 使用 Dockerfile-25.10 建置 hanlo 的 .deb，確認 `dpkg -c` 內容正確
+- [ ] 8.4 在 Ubuntu 25.10 環境安裝 .deb，確認 fcitx5 輸入法清單出現漢羅輸入法

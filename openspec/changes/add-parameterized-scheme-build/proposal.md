@@ -13,7 +13,7 @@ fcitx5-rime 目前是 fcitx5 的通用 Rime 包裝器。我們需要讓它產生
 - 將 `rimeengine.cpp` 中約 20 處硬編碼的 `"rime"` / `"fcitx-rime"` / `"fcitx_rime"` 字串替換為編譯期巨集，並以 `#ifndef` 預設值保留未設定 `-DSCHEME_ID` 時的上游行為
 - 新增 `schemes.cmake` 模組，包含參數化建置邏輯，由主 `CMakeLists.txt` 有條件地引入
 - 安裝方案資料檔（`*.schema.yaml`、`*.dict.yaml`、`*.symbol.yaml`、`default.yaml`），從 `schemes/<name>/sujiphoat/` 安裝到各方案的 `RIME_DATA_DIR`
-- 新增 Ubuntu .deb 打包用的 Dockerfile（參考現有的 Rime-HanLo/ubuntu_script/Dockerfile-22.04 模式，升級為 fcitx5 版本）
+- 新增 Ubuntu 25.10 .deb 打包用的 Dockerfile（需要 fcitx5 >= 5.1.13，Ubuntu 25.10 提供 5.1.14）
 - 新增 `packaging/build-all.sh`，一次建置所有 5 個 .deb 套件
 - 提供常見 Linux 發行版的打包指引（Fedora/RPM、Arch/PKGBUILD、openSUSE）
 
@@ -24,7 +24,7 @@ fcitx5-rime 目前是 fcitx5 的通用 Rime 包裝器。我們需要讓它產生
 - `scheme-submodules`：在 `schemes/` 下以 git submodule 管理 5 個台文輸入法方案 repo，並在專案根目錄以 submodule 管理 Rime-Logo（圖示來源）
 - `parameterized-build`：透過 `-DSCHEME_ID` 的 CMake 參數化機制，從共用程式碼庫產出特定方案的 fcitx5 addon
 - `scheme-addon-identity`：編譯期身份系統（addon 名稱、圖示、action 名稱、使用者資料目錄），確保多個方案 addon 可以共存而不衝突
-- `linux-packaging`：Dockerfile 與腳本，用於產出各方案的 .deb 套件，另附 Fedora、Arch、openSUSE 的打包參考
+- `linux-packaging`：Ubuntu 25.10 Dockerfile 與腳本，用於產出各方案的 .deb 套件，另附 Fedora、Arch、openSUSE 的打包參考
 
 ### Modified Capabilities
 

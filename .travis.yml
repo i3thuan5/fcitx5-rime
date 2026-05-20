@@ -1,0 +1,14 @@
+---
+os: linux
+dist: jammy
+language: minimal
+services:
+  - docker
+branches:
+  only:
+    - main
+jobs:
+  include:
+    - name: Build and verify .deb packages (Ubuntu 26.04)
+      script:
+        - ./packaging/build-all.sh

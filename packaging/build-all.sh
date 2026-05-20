@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build .deb packages for all 5 schemes on Ubuntu 25.10
+# Build .deb packages for all 5 schemes on Ubuntu 26.04
 #
 # Usage: ./build-all.sh [APP_VERSION]
 #   APP_VERSION defaults to 1.0.0
@@ -9,9 +9,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 OUTPUT_DIR="${PROJECT_DIR}/build/deb"
-APP_VERSION="${1:-1.0.0}"
+APP_VERSION="${1:-2.0.0}"
 SCHEMES_CONF="${SCRIPT_DIR}/schemes.conf"
-UBUNTU_VER="25.10"
+UBUNTU_VER="26.04"
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -49,9 +49,7 @@ while IFS=$'\t ' read -r SUBMODULE ID NAME LABEL LANG_CODE ICON_TOO rest; do
         "$PROJECT_DIR"
 
     # Extract .deb from container
-    CONTAINER_ID=$(docker create "$TAG")
-    docker cp "$CONTAINER_ID:/output/." "$OUTPUT_DIR/"
-    docker rm "$CONTAINER_ID" > /dev/null
+    docker run --rm "$TAG" > "$OUTPUT_DIR/$DEB_FILE"
 
     echo "  Done: $OUTPUT_DIR/$DEB_FILE"
     echo ""

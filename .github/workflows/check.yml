@@ -16,8 +16,8 @@ jobs:
         run: |
           pacman -Syu --noconfirm git clang diffutils
           git config --global --add safe.directory $GITHUB_WORKSPACE
-      - uses: actions/checkout@v4
-      - uses: fcitx/github-actions@clang-format
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: fcitx/github-actions@cecd5e61153b12d2c4d19425764a8ad26f0ebae3 # clang-format
   check:
     name: Build and test
     needs: clang-format
@@ -39,37 +39,37 @@ jobs:
       - name: Install dependencies
         run: |
           pacman -Syu --noconfirm base-devel clang cmake ninja extra-cmake-modules fmt libuv librime librime-data
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           repository: fcitx/fcitx5
           path: fcitx5
       - name: Cache fcitx5 data files
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: 'fcitx5/**/*.tar.*'
           key: ${{ runner.os }}-${{ hashFiles('fcitx5/src/modules/spell/CMakeLists.txt')
             }}
       - name: Build and Install fcitx5
-        uses: fcitx/github-actions@cmake
+        uses: fcitx/github-actions@43ad8c54d748810737099dd7002397c444e81c3d # cmake
         with:
           path: fcitx5
           cmake-option: >-
             -DENABLE_KEYBOARD=Off -DENABLE_X11=Off -DENABLE_WAYLAND=Off -DENABLE_ENCHANT=Off
             -DENABLE_DBUS=Off -DENABLE_SERVER=Off -DENABLE_EMOJI=Off -DUSE_SYSTEMD=Off
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           path: fcitx5-rime
       - name: Init CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@458d36d7d4f47d0dd16ca424c1d3cda0060f1360 # v3
         with:
           languages: cpp
           source-root: fcitx5-rime
       - name: Build and Install fcitx5-rime
-        uses: fcitx/github-actions@cmake
+        uses: fcitx/github-actions@43ad8c54d748810737099dd7002397c444e81c3d # cmake
         with:
           path: fcitx5-rime
       - name: Test
         run: |
           ctest --test-dir fcitx5-rime/build
       - name: CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@b8d3b6e8af63cde30bdc382c0bc28114f4346c88 # v2

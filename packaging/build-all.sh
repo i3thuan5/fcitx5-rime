@@ -2,7 +2,7 @@
 # Build .deb packages for all 5 schemes on Ubuntu 26.04
 #
 # Usage: ./build-all.sh [APP_VERSION]
-#   APP_VERSION defaults to 1.0.0
+#   APP_VERSION defaults to 2.0.0
 
 set -euo pipefail
 

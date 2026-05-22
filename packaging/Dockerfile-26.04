@@ -77,17 +77,15 @@ COPY --from=packager /output/ /tmp/deb/
 
 RUN apt-get update \
     && apt-get install -y fcitx5 librime1 \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN dpkg -i /tmp/deb/*.deb
-
-RUN ls /usr/lib/*/fcitx5/lib${SCHEME_ID}.so
-RUN test -f /usr/share/fcitx5/addon/${SCHEME_ID}.conf
-RUN test -f /usr/share/fcitx5/inputmethod/${SCHEME_ID}.conf
-RUN ls /usr/share/${SCHEME_ID}/data/*.yaml
-RUN ls /usr/share/icons/hicolor/48x48/apps/fcitx-${SCHEME_ID}.png
-RUN ls /usr/share/icons/hicolor/scalable/apps/fcitx-${SCHEME_ID}.svg
-RUN [ -z "${SCHEME_ICON_TOO}" ] || ls /usr/share/icons/hicolor/48x48/apps/fcitx_${SCHEME_ID}_im.png
+    && rm -rf /var/lib/apt/lists/* \
+    && dpkg -i /tmp/deb/*.deb \
+    && ls /usr/lib/*/fcitx5/lib${SCHEME_ID}.so \
+    && test -f /usr/share/fcitx5/addon/${SCHEME_ID}.conf \
+    && test -f /usr/share/fcitx5/inputmethod/${SCHEME_ID}.conf \
+    && ls /usr/share/${SCHEME_ID}/data/*.yaml \
+    && ls /usr/share/icons/hicolor/48x48/apps/fcitx-${SCHEME_ID}.png \
+    && ls /usr/share/icons/hicolor/scalable/apps/fcitx-${SCHEME_ID}.svg \
+    && [ -z "${SCHEME_ICON_TOO}" ] || ls /usr/share/icons/hicolor/48x48/apps/fcitx_${SCHEME_ID}_im.png
 
 # ─── Stage 5: exporter ───────────────────────────────────────────────────────
 FROM verifier AS exporter

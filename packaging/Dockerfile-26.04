@@ -26,7 +26,7 @@ ARG SCHEME_LABEL
 ARG SCHEME_LANG_CODE=nan-TW
 ARG SCHEME_ICON_TOO
 
-COPY . /src
+COPY CMakeLists.txt schemes.cmake org.fcitx.Fcitx5.Addon.Rime.metainfo.xml.in cmake/ src/ data/ po/ schemes/ Rime-Logo/ /src/
 WORKDIR /build
 
 RUN cmake /src \
@@ -94,4 +94,5 @@ FROM verifier AS exporter
 
 COPY --from=packager /output/ /output/
 
+USER nobody
 CMD ["sh", "-c", "cat /output/*.deb"]

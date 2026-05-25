@@ -26,7 +26,13 @@ ARG SCHEME_LABEL
 ARG SCHEME_LANG_CODE=nan-TW
 ARG SCHEME_ICON_TOO
 
-COPY CMakeLists.txt schemes.cmake org.fcitx.Fcitx5.Addon.Rime.metainfo.xml.in cmake/ src/ data/ po/ schemes/ Rime-Logo/ /src/
+COPY CMakeLists.txt schemes.cmake org.fcitx.Fcitx5.Addon.Rime.metainfo.xml.in /src/
+COPY cmake/ /src/cmake/
+COPY src/ /src/src/
+COPY data/ /src/data/
+COPY po/ /src/po/
+COPY schemes/ /src/schemes/
+COPY Rime-Logo/ /src/Rime-Logo/
 WORKDIR /build
 
 RUN cmake /src \

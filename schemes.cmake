@@ -120,10 +120,13 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/schemes/${SCHEME_SUBMODULE}/sujiphoat")
     file(GLOB SCHEME_DATA_FILES
         "${CMAKE_SOURCE_DIR}/schemes/${SCHEME_SUBMODULE}/sujiphoat/*.yaml")
     list(FILTER SCHEME_DATA_FILES EXCLUDE REGEX ".*\\.squirrel\\..*")
+    if(NOT SCHEME_DATA_FILES)
+        message(FATAL_ERROR "No .yaml files found in schemes/${SCHEME_SUBMODULE}/sujiphoat/ — is the submodule initialized?")
+    endif()
     install(FILES ${SCHEME_DATA_FILES} DESTINATION "${RIME_DATA_DIR}")
     message(STATUS "Scheme data files found: ${SCHEME_DATA_FILES}")
 else()
-    message(WARNING "Scheme data directory not found: schemes/${SCHEME_SUBMODULE}/sujiphoat/")
+    message(FATAL_ERROR "Scheme data directory not found: schemes/${SCHEME_SUBMODULE}/sujiphoat/ — is the submodule initialized?")
 endif()
 
 # Install icons

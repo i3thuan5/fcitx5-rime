@@ -50,11 +50,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 include("${FCITX_INSTALL_CMAKECONFIG_DIR}/Fcitx5Utils/Fcitx5CompilerSettings.cmake")
 
-add_subdirectory(po)
-
 if(SCHEME_ID)
   include(schemes.cmake)
 else()
+  add_subdirectory(po)
   add_subdirectory(src)
   add_subdirectory(data)
 

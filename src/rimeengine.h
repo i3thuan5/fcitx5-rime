@@ -43,6 +43,17 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#ifdef HAVE_SCHEME_CONFIG
+#include "scheme_config.h"
+#endif
+
+#ifndef SCHEME_ADDON_NAME
+#define SCHEME_ADDON_NAME "rime"
+#endif
+#ifndef SCHEME_CONF_PREFIX
+#define SCHEME_CONF_PREFIX "fcitx-rime"
+#endif
+
 #ifndef FCITX_RIME_NO_DBUS
 #include "rimeservice.h"
 #endif
@@ -102,7 +113,7 @@ FCITX_CONFIGURATION(
             "xdg-open \"",
             stringutils::replaceAll((StandardPaths::global().userDirectory(
                                          StandardPathsType::PkgData) /
-                                     "rime")
+                                     SCHEME_ADDON_NAME)
                                         .string(),
                                     "\"", "\"\"\""),
             "\"")};
@@ -132,7 +143,7 @@ public:
     const Configuration *getConfig() const override { return &config_; }
     void setConfig(const RawConfig &config) override {
         config_.load(config, true);
-        safeSaveAsIni(config_, "conf/rime.conf");
+        safeSaveAsIni(config_, "conf/" SCHEME_ADDON_NAME ".conf");
         updateConfig();
     }
     void setSubConfig(const std::string &path,

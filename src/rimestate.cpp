@@ -442,7 +442,7 @@ void RimeState::release() { session_.reset(); }
 void RimeState::commitInput(InputContext *ic) {
     if (auto *api = engine_->api()) {
         if (const char *input = api->get_input(this->session())) {
-            if (std::strlen(input) > 0) {
+            if (input[0] != '\0') {
                 ic->commitString(input);
             }
         }

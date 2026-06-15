@@ -38,6 +38,6 @@
 
 ## 8. 手動驗證（需有 Docker 的機器）
 
-- [ ] 8.1 執行 `./packaging/build-all.sh 2.0.0`，確認 `build/deb/` 出現 5 個 .deb（`fcitx5-{hanlo,poj,pojhan,toj,tsuanlo}_2.0.0~ubuntu24.04_ubuntu24.04.deb`）
-- [ ] 8.2 若 cmake/make 失敗，逐 error 排查（可能是缺少的 API 或 include 路徑問題）
-- [ ] 8.3 在 Ubuntu 24.04 環境安裝 .deb，確認 fcitx5 輸入法清單出現台文方案
+- [x] 8.1 執行 `./packaging/build-all.sh 2.0.0`，確認 `build/deb/` 出現 5 個 .deb（`fcitx5-{hanlo,poj,pojhan,toj,tsuanlo}_2.0.0~ubuntu24.04_ubuntu24.04.deb`）
+- [x] 8.2 若 cmake/make 失敗，逐 error 排查（可能是缺少的 API 或 include 路徑問題）
+- [x] 8.3 在 Ubuntu 24.04 環境安裝 .deb，確認 fcitx5 輸入法清單出現台文方案

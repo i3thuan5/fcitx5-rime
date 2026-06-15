@@ -20,10 +20,29 @@ DEB_VERSION="${APP_VERSION}~ubuntu${UBUNTU_VER}"
 
 mkdir -p "$OUTPUT_DIR"
 
+# ─── Step 0: Build librime-ithuan ────────────────────────────────────────────
+LIBRIME_TAG="librime-ithuan-ubuntu${UBUNTU_VER}"
+LIBRIME_DOCKERFILE="${SCRIPT_DIR}/Dockerfile-librime-${UBUNTU_VER}"
+
+echo "=== Building librime-ithuan (Ubuntu ${UBUNTU_VER}) ==="
+docker build \
+    -f "$LIBRIME_DOCKERFILE" \
+    -t "$LIBRIME_TAG" \
+    "$PROJECT_DIR"
+
+# Read librime version from image
+LIBRIME_VERSION=$(docker run --rm "$LIBRIME_TAG" cat /librime-version.txt)
+LIBRIME_DEB_FILE="librime-ithuan1_${LIBRIME_VERSION}~ubuntu${UBUNTU_VER}.deb"
+
+docker run --rm "$LIBRIME_TAG" > "$OUTPUT_DIR/$LIBRIME_DEB_FILE"
+echo "  Done: $OUTPUT_DIR/$LIBRIME_DEB_FILE"
+echo ""
+
 echo "=== Building .deb packages for all schemes (Ubuntu ${UBUNTU_VER}) ==="
 echo "Project:     $PROJECT_DIR"
 echo "Version:     $APP_VERSION"
 echo "Deb Version: $DEB_VERSION"
+echo "librime:     $LIBRIME_VERSION"
 echo "Ubuntu:      $UBUNTU_VER"
 echo "Output:      $OUTPUT_DIR"
 echo ""

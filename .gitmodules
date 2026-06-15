@@ -16,3 +16,6 @@
 [submodule "Rime-Logo"]
 	path = Rime-Logo
 	url = git@github.com:i3thuan5/Rime-Logo.git
+[submodule "librime-ithuan"]
+	path = librime-ithuan
+	url = git@github.com:i3thuan5/librime.git

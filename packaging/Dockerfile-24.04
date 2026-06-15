@@ -13,8 +13,9 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     fcitx5-modules-dev \
     libfcitx5core-dev \
-    librime-dev \
     && rm -rf /var/lib/apt/lists/*
+
+COPY --from=librime-ithuan-ubuntu24.04 /staging/ /
 
 # ─── Stage 2: builder ────────────────────────────────────────────────────────
 FROM deps AS builder
@@ -62,7 +63,7 @@ Section: utils\n\
 Priority: optional\n\
 Version: ${APP_VERSION}\n\
 Architecture: $(dpkg --print-architecture)\n\
-Depends: fcitx5, librime1 (>= 1.7.0), libc6 (>= 2.14), libstdc++6 (>= 7)\n\
+Depends: fcitx5, librime-ithuan2 (>= 2.0.0), libc6 (>= 2.14), libstdc++6 (>= 7)\n\
 Maintainer: ÌTHUÂNKHOKI <ithuan@ithuan.tw>\n\
 Homepage: https://ithuan.tw\n\
 Description: ${SCHEME_NAME} Input Method for Fcitx5\n\
@@ -81,8 +82,10 @@ ENV TZ=Asia/Taipei
 
 COPY --from=packager /output/ /tmp/deb/
 
+COPY --from=librime-ithuan-ubuntu24.04 /staging/ /
+
 RUN apt-get update \
-    && apt-get install -y fcitx5 librime1 \
+    && apt-get install -y fcitx5 \
     && rm -rf /var/lib/apt/lists/* \
     && dpkg -i /tmp/deb/*.deb \
     && ls /usr/lib/*/fcitx5/lib${SCHEME_ID}.so \

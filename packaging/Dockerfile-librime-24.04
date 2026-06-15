@@ -1,0 +1,92 @@
+# ─── Stage 1: deps ───────────────────────────────────────────────────────────
+FROM ubuntu:24.04 AS deps
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Taipei
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    dpkg-dev \
+    libboost-filesystem-dev \
+    libboost-locale-dev \
+    libboost-regex-dev \
+    libboost-system-dev \
+    libgoogle-glog-dev \
+    libleveldb-dev \
+    libmarisa-dev \
+    libyaml-cpp-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# ─── Stage 2: builder ────────────────────────────────────────────────────────
+FROM deps AS builder
+
+COPY librime-ithuan/ /src/librime-ithuan/
+WORKDIR /build
+
+RUN cmake /src/librime-ithuan \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_TEST=OFF \
+    -DBUILD_DATA=OFF
+
+RUN make -j$(nproc)
+RUN make install DESTDIR=/staging
+
+# ─── Stage 3: packager ───────────────────────────────────────────────────────
+FROM builder AS packager
+
+RUN LIBRIME_VERSION=$(grep -m1 'set(rime_version' /src/librime-ithuan/CMakeLists.txt \
+        | grep -oP '\d+\.\d+\.\d+') \
+    && echo "${LIBRIME_VERSION}" > /librime-version.txt \
+    && UBUNTU_VER="24.04" \
+    && DEB_VERSION="${LIBRIME_VERSION}~ubuntu${UBUNTU_VER}" \
+    && ARCH=$(dpkg --print-architecture) \
+    && mkdir -p /staging/DEBIAN /output \
+    && printf "Package: librime-ithuan2\n\
+Source: librime-ithuan2\n\
+Section: libs\n\
+Priority: optional\n\
+Version: ${DEB_VERSION}\n\
+Architecture: ${ARCH}\n\
+Depends: libc6 (>= 2.17), libstdc++6 (>= 7), \
+libboost-filesystem1.83.0, libboost-locale1.83.0, \
+libboost-regex1.83.0, libboost-system1.83.0, \
+libgoogle-glog0v6, libleveldb1d, \
+libmarisa0 (>= 0.2.5), libyaml-cpp0.8\n\
+Maintainer: ÌTHUÂNKHOKI <ithuan@ithuan.tw>\n\
+Homepage: https://ithuan.tw\n\
+Description: Rime Input Method Engine (ithuan fork) for Ubuntu 24.04\n\
+ Custom Rime library (librime-ithuan) for Taiwanese input methods.\n\
+ Coexists with system librime1 via a different library name.\n" \
+    > /staging/DEBIAN/control \
+    && dpkg-deb --build /staging \
+        "/output/librime-ithuan2_${DEB_VERSION}_${ARCH}.deb"
+
+# ─── Stage 4: verifier ───────────────────────────────────────────────────────
+FROM ubuntu:24.04 AS verifier
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Taipei
+
+COPY --from=packager /output/ /tmp/deb/
+
+RUN apt-get update \
+    && apt-get install -y gcc pkg-config \
+    && rm -rf /var/lib/apt/lists/* \
+    && dpkg -i /tmp/deb/*.deb \
+    && ls /usr/lib/*/librime-ithuan.so.1 \
+    && pkg-config --exists rime-ithuan \
+    && pkg-config --libs rime-ithuan | grep -q '\-lrime-ithuan' \
+    && printf '#include <rime_api.h>\nint main(){return 0;}' \
+        | gcc -x c - $(pkg-config --cflags rime-ithuan) -o /dev/null
+
+# ─── Stage 5: exporter ───────────────────────────────────────────────────────
+FROM verifier AS exporter
+
+COPY --from=packager /output/ /output/
+COPY --from=packager /librime-version.txt /librime-version.txt
+
+USER nobody
+CMD ["sh", "-c", "cat /output/*.deb"]

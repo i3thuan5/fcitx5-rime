@@ -58,3 +58,18 @@
 
 ### 不需要
 - `.github/workflows/build-24.04.yml`（使用者確認只用 Travis CI）
+
+## 客製 librime（librime-ithuan）
+
+- 來源：`https://github.com/i3thuan5/librime`（fork，與上游有 4–5 年差異）
+- 本地快照：`other/librime/`
+- Submodule 路徑（規劃中）：`librime-ithuan/`
+- **fork 內版本號**：`set(rime_version 2.0.0)`（`librime-ithuan/CMakeLists.txt` 第 7 行，已更新）
+- **共存策略**：不同 library 名稱（`librime-ithuan.so.1`），與系統 `librime.so.1` 完全獨立
+- **需改 librime fork 的 3 個地方**：
+  1. `src/CMakeLists.txt`：`set_target_properties(rime PROPERTIES OUTPUT_NAME rime-ithuan ...)`
+  2. `rime.pc.in`：`Name: rime-ithuan`、`Libs: -lrime-ithuan`
+  3. `CMakeLists.txt`：`configure_file(rime.pc.in rime-ithuan.pc)`、`install(... rime-ithuan.pc)`
+- **fcitx5-rime CMakeLists.txt**：`pkg_check_modules` 改找 `"rime-ithuan>=1.0.0"`
+- **Docker 傳遞方式**：方案 3（`COPY --from=librime-ithuan-ubuntu24.04`），不需把 .deb 複製進 build context
+- **最終輸出**：`librime-ithuan_1.5.3_ubuntu24.04.deb` + 5 個方案 .deb（共 6 個）

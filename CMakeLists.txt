@@ -16,7 +16,7 @@ find_package(Fcitx5Module REQUIRED COMPONENTS Notifications)
 find_package(PkgConfig REQUIRED)
 
 if (NOT DEFINED RIME_TARGET)
-    pkg_check_modules(Rime REQUIRED IMPORTED_TARGET "rime>=1.0.0")
+    pkg_check_modules(Rime REQUIRED IMPORTED_TARGET "rime-ithuan>=2.0.0")
     set(RIME_TARGET PkgConfig::Rime)
 endif()
 

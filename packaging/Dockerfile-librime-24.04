@@ -73,10 +73,9 @@ ENV TZ=Asia/Taipei
 COPY --from=packager /output/ /tmp/deb/
 
 RUN apt-get update \
-    && apt-get install -y gcc pkg-config \
+    && apt-get install -y gcc pkg-config /tmp/deb/*.deb \
     && rm -rf /var/lib/apt/lists/* \
-    && dpkg -i /tmp/deb/*.deb \
-    && ls /usr/lib/*/librime-ithuan.so.1 \
+    && ls /usr/lib/*/librime-ithuan.so.2 \
     && pkg-config --exists rime-ithuan \
     && pkg-config --libs rime-ithuan | grep -q '\-lrime-ithuan' \
     && printf '#include <rime_api.h>\nint main(){return 0;}' \
@@ -86,6 +85,7 @@ RUN apt-get update \
 FROM verifier AS exporter
 
 COPY --from=packager /output/ /output/
+COPY --from=packager /staging/ /staging/
 COPY --from=packager /librime-version.txt /librime-version.txt
 
 USER nobody

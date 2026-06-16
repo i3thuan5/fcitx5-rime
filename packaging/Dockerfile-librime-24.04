@@ -42,14 +42,14 @@ RUN LIBRIME_VERSION=$(grep -m1 'set(rime_version' /src/librime-ithuan/CMakeLists
         | grep -oP '\d+\.\d+\.\d+') \
     && echo "${LIBRIME_VERSION}" > /librime-version.txt \
     && UBUNTU_VER="24.04" \
-    && DEB_VERSION="${LIBRIME_VERSION}~ubuntu${UBUNTU_VER}" \
+    && DEB_FILENAME_VERSION="${LIBRIME_VERSION}~ubuntu${UBUNTU_VER}" \
     && ARCH=$(dpkg --print-architecture) \
     && mkdir -p /staging/DEBIAN /output \
     && printf "Package: librime-ithuan2\n\
 Source: librime-ithuan2\n\
 Section: libs\n\
 Priority: optional\n\
-Version: ${DEB_VERSION}\n\
+Version: ${LIBRIME_VERSION}\n\
 Architecture: ${ARCH}\n\
 Depends: libc6 (>= 2.17), libstdc++6 (>= 7), \
 libboost-filesystem1.83.0, libboost-locale1.83.0, \
@@ -63,7 +63,7 @@ Description: Rime Input Method Engine (ithuan fork) for Ubuntu 24.04\n\
  Coexists with system librime1 via a different library name.\n" \
     > /staging/DEBIAN/control \
     && dpkg-deb --build /staging \
-        "/output/librime-ithuan2_${DEB_VERSION}_${ARCH}.deb"
+        "/output/librime-ithuan2_${DEB_FILENAME_VERSION}_${ARCH}.deb"
 
 # ─── Stage 4: verifier ───────────────────────────────────────────────────────
 FROM ubuntu:24.04 AS verifier

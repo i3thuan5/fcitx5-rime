@@ -28,6 +28,7 @@
 #include <optional>
 #include <rime_api.h>
 #include <stdexcept>
+#include <algorithm>
 #include <string>
 
 FCITX_DEFINE_LOG_CATEGORY(rime, "rime");
@@ -731,21 +732,23 @@ std::string RimeEngine::subModeLabelImpl(const InputMethodEntry &,
     return "";
 }
 
-std::string RimeEngine::subModeIconImpl(const InputMethodEntry &,
+std::string RimeEngine::subModeIconImpl(const InputMethodEntry &entry,
                                         InputContext &ic) {
-    std::string result = "fcitx-rime";
+    std::string base = entry.icon();
+    std::string prefix = base;
+    std::replace(prefix.begin(), prefix.end(), '-', '_');
+
+    std::string result = base;
     if (!factory_.registered()) {
         return result;
     }
     auto state = this->state(&ic);
     if (state) {
-        state->getStatus([&result](const RimeStatus &status) {
+        state->getStatus([&result, &prefix](const RimeStatus &status) {
             if (status.is_disabled) {
-                result = "fcitx_rime_disable";
+                result = prefix + "_disable";
             } else if (status.is_ascii_mode) {
-                result = "fcitx_rime_latin";
-            } else {
-                result = "fcitx-rime";
+                result = prefix + "_latin";
             }
         });
     }

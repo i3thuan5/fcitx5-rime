@@ -32,7 +32,8 @@ RUN cmake /src/librime-ithuan \
     -DBUILD_DATA=OFF
 
 RUN make -j$(nproc)
-RUN make install DESTDIR=/staging
+RUN make install DESTDIR=/staging \
+    && rm -rf /staging/usr/bin /staging/usr/share/rime-data
 
 # ─── Stage 3: packager ───────────────────────────────────────────────────────
 FROM builder AS packager
